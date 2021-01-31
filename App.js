@@ -11,16 +11,21 @@ import {
 import { AntDesign } from "@expo/vector-icons";
 import colors from "./Colors";
 import TodoList from "./screens/TodoList";
-import AddListModal from "./screens/AddListModal";
+import AddProjModal from "./screens/AddProjModal";
+import DelProjModal from "./screens/DelProjModal";
 import DB from "./database/firebaseDB";
+import Dialog, { DialogContent } from "react-native-popup-dialog";
 
 export default class App extends React.Component {
   state = {
     addTodoVisible: false,
+    delTodoVisible: false,
     lists: [],
     user: {},
     loading: true,
   };
+
+  // check for user and db connection
 
   componentDidMount() {
     firebase = new DB((error, user) => {
@@ -42,13 +47,19 @@ export default class App extends React.Component {
     firebase.detach();
   }
 
-  toggleAddTodoModal() {
+  toggleAddProjModal() {
     this.setState({ addTodoVisible: !this.state.addTodoVisible });
+  }
+
+  toggleDelProjModal() {
+    this.setState({ delTodoVisible: !this.state.delTodoVisible });
   }
 
   renderList = (list) => {
     return <TodoList list={list} updateList={this.updateList} />;
   };
+
+  // add list for Projects
 
   addList = (list) => {
     firebase.addList({
@@ -57,6 +68,25 @@ export default class App extends React.Component {
       todos: [],
     });
   };
+
+  delList = (list) => {
+    console.log(list);
+
+    // return firebase
+    //   .collection("users")
+    //   .doc("lrXb7NL8umWgiRxoLt5gCRTAwQw2")
+    //   .collection("lists")
+    //   .doc($list)
+    //   .delete()
+    //   .then(function () {
+    //     console.log("Document successfully deleted!");
+    //   })
+    //   .catch(function (error) {
+    //     console.error("Error removing document: ", error);
+    //   });
+  };
+
+  // update list for Projects
 
   updateList = (list) => {
     firebase.updateList(list);
@@ -76,32 +106,54 @@ export default class App extends React.Component {
         <Modal
           animationType="slide"
           visible={this.state.addTodoVisible}
-          onRequestClose={() => this.toggleAddTodoModal()}
+          onRequestClose={() => this.toggleAddProjModal()}
         >
-          <AddListModal
-            closeModal={() => this.toggleAddTodoModal()}
+          <AddProjModal
+            closeModal={() => this.toggleAddProjModal()}
             addList={this.addList}
+          />
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          visible={this.state.delTodoVisible}
+          onRequestClose={() => this.toggleDelProjModal()}
+        >
+          <DelProjModal
+            closeModal={() => this.toggleDelProjModal()}
+            delList={this.delList}
           />
         </Modal>
 
         <View style={{ flexDirection: "row" }}>
           <View style={styles.divider} />
           <Text style={styles.title}>
-            Todo{" "}
-            <Text style={{ fontWeight: "300", color: colors.blue }}>Lists</Text>
+            Project{" "}
+            <Text style={{ fontWeight: "300", color: colors.blue }}>
+              Manager
+            </Text>
           </Text>
           <View style={styles.divider} />
         </View>
 
-        <View style={{ marginVertical: 48 }}>
+        <View style={{ marginVertical: 20 }}>
           <TouchableOpacity
             style={styles.addList}
-            onPress={() => this.toggleAddTodoModal()}
+            onPress={() => this.toggleAddProjModal()}
           >
             <AntDesign name="plus" size={16} color={colors.blue} />
           </TouchableOpacity>
 
-          <Text style={styles.add}>Add List</Text>
+          <Text style={styles.add}>Add Project</Text>
+
+          <TouchableOpacity
+            style={styles.delList}
+            onPress={() => this.toggleDelProjModal()}
+          >
+            <AntDesign name="minus" size={16} color={colors.red} />
+          </TouchableOpacity>
+
+          <Text style={styles.delete}>Delete Project</Text>
         </View>
 
         <View style={{ height: 275, paddingLeft: 32 }}>
@@ -141,13 +193,27 @@ const styles = StyleSheet.create({
   addList: {
     borderWidth: 2,
     borderColor: colors.lightBlue,
-    borderRadius: 4,
-    padding: 16,
+    borderRadius: 2,
+    padding: 15,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
+  },
+  delList: {
+    borderWidth: 2,
+    borderColor: colors.red,
+    borderRadius: 2,
+    padding: 15,
+    alignItems: "center",
+    justifyContent: "flex-end",
   },
   add: {
     color: colors.blue,
+    fontWeight: "600",
+    fontSize: 14,
+    marginTop: 8,
+  },
+  delete: {
+    color: colors.red,
     fontWeight: "600",
     fontSize: 14,
     marginTop: 8,

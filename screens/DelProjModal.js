@@ -9,45 +9,27 @@ import {
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import colors from "../Colors";
+import Dialog, {
+  DialogFooter,
+  DialogButton,
+  DialogContent,
+} from "react-native-popup-dialog";
 
-export default class AddListModal extends React.Component {
-  backgroundColors = [
-    "#5CD859",
-    "#24A6D9",
-    "#595BD9",
-    "#8022D9",
-    "#D159D8",
-    "#D85963",
-    "#D88559",
-  ];
-
+export default class AddProjModal extends React.Component {
   state = {
     name: "",
-    color: this.backgroundColors[0],
   };
 
-  createTodo = () => {
-    const { name, color } = this.state;
+  delProj = () => {
+    const { name } = this.state;
 
-    const list = { name, color };
+    const list = { name };
 
-    this.props.addList(list);
+    this.props.delList(list);
 
     this.setState({ name: "" });
     this.props.closeModal();
   };
-
-  renderColors() {
-    return this.backgroundColors.map((color) => {
-      return (
-        <TouchableOpacity
-          key={color}
-          style={[styles.colorSelect, { backgroundColor: color }]}
-          onPress={() => this.setState({ color })}
-        />
-      );
-    });
-  }
 
   render() {
     return (
@@ -60,11 +42,11 @@ export default class AddListModal extends React.Component {
         </TouchableOpacity>
 
         <View style={{ alignSelf: "stretch", marginHorizontal: 32 }}>
-          <Text style={styles.title}>Create Todo List</Text>
+          <Text style={styles.title}>Delete Project</Text>
 
           <TextInput
             style={styles.input}
-            placeholder="List Name?"
+            placeholder="Project Name?"
             onChangeText={(text) => this.setState({ name: text })}
           />
 
@@ -74,16 +56,11 @@ export default class AddListModal extends React.Component {
               justifyContent: "space-between",
               marginTop: 12,
             }}
-          >
-            {this.renderColors()}
-          </View>
+          ></View>
 
-          <TouchableOpacity
-            style={[styles.create, { backgroundColor: this.state.color }]}
-            onPress={this.createTodo}
-          >
+          <TouchableOpacity style={[styles.create]} onPress={this.delProj}>
             <Text style={{ color: colors.white, fontWeight: "600" }}>
-              Create!
+              Delete!
             </Text>
           </TouchableOpacity>
         </View>
@@ -120,6 +97,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "red",
   },
   colorSelect: {
     width: 30,
